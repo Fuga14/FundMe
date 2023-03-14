@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import './PriceConverter.sol';
 
-contract FundMe {
+contract Fund {
     using PriceConverter for uint256;
 
     uint256 public minimumUsd = 50 * 1e18;
@@ -12,15 +12,18 @@ contract FundMe {
 
     address public owner;
 
-    constructor() {
+    AggregatorV3Interface public priceFeed;
+
+    constructor(address priceFeedAddress) {
         owner = msg.sender;
+        priceFeed = AggregatorV3Interface(priceFeedAddress);
     }
 
     function fund() public payable {
         // Want to be able to set a minimum fund amount in USD
         // require(getConversionRate(msg.value) >= minimumUsd, "Didnt send enough money"); // 1e18 == 1 * 10 ** 18 == 100000000000000000 = 1 eth
         require(
-            msg.value.getConversionRate() >= minimumUsd,
+            msg.value.getConversionRate(priceFeed) >= minimumUsd,
             'Didnt send enough money'
         );
         funders.push(msg.sender);
