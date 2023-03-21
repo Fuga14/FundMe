@@ -2,23 +2,23 @@
 // 1. Pragma
 pragma solidity ^0.8.7;
 // 2. Imports
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "./PriceConverter.sol";
+import '@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol';
+import './PriceConverter.sol';
 
 // 3. Interfaces, Libraries, Contracts
-error FundMe__NotOwner();
+error Fund__NotOwner();
 
 /**@title A sample Funding Contract
  * @author Patrick Collins
  * @notice This contract is for creating a sample funding contract
  * @dev This implements price feeds as our library
  */
-contract FundMe {
+contract Fund {
     // Type Declarations
     using PriceConverter for uint256;
 
     // State variables
-    uint256 public constant MINIMUM_USD = 50 * 10**18;
+    uint256 public constant MINIMUM_USD = 50 * 10 ** 18;
     address private immutable i_owner;
     address[] private s_funders;
     mapping(address => uint256) private s_addressToAmountFunded;
@@ -29,7 +29,7 @@ contract FundMe {
     // Modifiers
     modifier onlyOwner() {
         // require(msg.sender == i_owner);
-        if (msg.sender != i_owner) revert FundMe__NotOwner();
+        if (msg.sender != i_owner) revert Fund__NotOwner();
         _;
     }
 
@@ -52,7 +52,7 @@ contract FundMe {
     function fund() public payable {
         require(
             msg.value.getConversionRate(s_priceFeed) >= MINIMUM_USD,
-            "You need to spend more ETH!"
+            'You need to spend more ETH!'
         );
         // require(PriceConverter.getConversionRate(msg.value) >= MINIMUM_USD, "You need to spend more ETH!");
         s_addressToAmountFunded[msg.sender] += msg.value;
@@ -71,7 +71,7 @@ contract FundMe {
         s_funders = new address[](0);
         // Transfer vs call vs Send
         // payable(msg.sender).transfer(address(this).balance);
-        (bool success, ) = i_owner.call{value: address(this).balance}("");
+        (bool success, ) = i_owner.call{value: address(this).balance}('');
         require(success);
     }
 
@@ -88,7 +88,7 @@ contract FundMe {
         }
         s_funders = new address[](0);
         // payable(msg.sender).transfer(address(this).balance);
-        (bool success, ) = i_owner.call{value: address(this).balance}("");
+        (bool success, ) = i_owner.call{value: address(this).balance}('');
         require(success);
     }
 
@@ -96,11 +96,9 @@ contract FundMe {
      *  @param fundingAddress the address of the funder
      *  @return the amount funded
      */
-    function getAddressToAmountFunded(address fundingAddress)
-        public
-        view
-        returns (uint256)
-    {
+    function getAddressToAmountFunded(
+        address fundingAddress
+    ) public view returns (uint256) {
         return s_addressToAmountFunded[fundingAddress];
     }
 
